@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch-1</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <h3 class="bg-primary text-white p-4">CURD App Using Fetch Api</h3>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="formContainer">
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <input type="text" id="title" required placeholder="Title" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="content">Content</label>
+                                <input type="text" id="content" required placeholder="Content" class="form-control">
+                            </div>
+                            <div class="text-right">
+                                <button type="button" id="cancelBtn" class="btn btn-danger">Cancel</button>
+                                <button type="button" id="updateBtn" class="btn btn-primary d-none">Update Post</button>
+                                <button type="submit" id="addPostBtn" class="btn btn-primary">Add Post</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 offset-md-3">
+                <div id="postsContainer"></div>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/js/app.js"></script>
+</body>
+
+</html>
