@@ -9,6 +9,7 @@ const contentControl = document.getElementById('content');
 const addPostBtn = document.getElementById('addPostBtn');
 const updateBtn = document.getElementById('updateBtn');
 const cancelBtn = document.getElementById('cancelBtn');
+const loader = document.getElementById('loader');
 
 
 const postsTemp = (arr) => {
@@ -29,9 +30,7 @@ const postsTemp = (arr) => {
                 </div>
             </div>
         `
-
     });
-
 }
 
 
@@ -51,6 +50,7 @@ const makeApiCall = (methodName, apiUrl, bodyMsg) => {
 
 makeApiCall("GET", postsUrl)
     .then((res) => {
+
         let data = [];
         for (const key in res) {
             let obj = {
@@ -60,9 +60,24 @@ makeApiCall("GET", postsUrl)
             data.push(obj)
         }
         postsTemp(data)
+        Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Posts Api is Success',
+            showConfirmButton: true,
+            timer: 2000
+        })
     })
     .catch((err) => {
-        cl(err)
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: err,
+            timer: 3000
+        })
+    })
+    .finally(() => {
+        loader.classList.add('d-none')
     })
 
 
@@ -86,18 +101,31 @@ formContainer.addEventListener('submit', (e) => {
                     <p>${obj.body}</p>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                <button type="button" class="btn btn-primary">Edit</button>
-                    <button type="button" class="btn btn-danger">Delete</button>     
+                    <button type="button" class="btn btn-primary" onclick="onEditHandler(this)">Edit</button>
+                    <button type="button" class="btn btn-danger" onclick="onDeleteHandler(this)">Delete</button>     
                 </div>
             `
             card.innerHTML = result;
-            postsContainer.prepend(card)
+            postsContainer.append(card)
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Posts is Successfully Create',
+                showConfirmButton: true,
+                timer: 2000
+            })
         })
         .catch((err) => {
-            cl(err)
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: err,
+                timer: 3000
+            })
         })
         .finally(() => {
             e.target.reset()
+            loader.classList.add('d-none')
         })
 
 })
@@ -113,45 +141,99 @@ const onEditHandler = (e) => {
             contentControl.value = res.body
         })
         .catch((err) => {
-            cl(err)
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: err,
+                timer: 3000
+            })
         })
         .finally(() => {
             addPostBtn.classList.add('d-none')
             updateBtn.classList.remove('d-none')
+            loader.classList.add('d-none')
         })
 }
 
-updateBtn.addEventListener('click' , (e) => {
+updateBtn.addEventListener('click', (e) => {
     let data = {
-        title : titleControl.value,
-        body : contentControl.value
+        title: titleControl.value,
+        body: contentControl.value
     }
     let updateId = localStorage.getItem('edit');
     localStorage.removeItem('edit')
     let updateUrl = `${baseUrl}posts/${updateId}.json`
-    
-    makeApiCall('PATCH' , updateUrl , data)
+
+    makeApiCall('PATCH', updateUrl, data)
         .then((res) => {
             const updateID = [...document.getElementById(updateId).children]
             updateID[0].innerHTML = `<h3>${data.title}</h3>`
             updateID[1].innerHTML = `<p>${data.body}</p>`
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Posts is Successfully Updated!!!',
+                showConfirmButton: true,
+                timer: 2000
+            })
         })
-        .catch((err) => {cl(err)})
+        .catch((err) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: err,
+                timer: 3000
+            })
+        })
         .finally(() => {
+            formContainer.reset();
             addPostBtn.classList.remove('d-none')
             updateBtn.classList.add('d-none')
+            loader.classList.add('d-none')
         })
 })
 
 const onDeleteHandler = (e) => {
     let deleteId = e.closest('.card').id
     let deleteUrl = `${baseUrl}posts/${deleteId}.json`
-    makeApiCall('DELETE' , deleteUrl)
-        .then((res) => {
-            const deleteID = document.getElementById(deleteId)
-            deleteID.remove()
-        })
-        .catch((err) => {cl(err)})
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't to delete this post!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success',
+                makeApiCall('DELETE', deleteUrl)
+                    .then((res) => {
+
+                        const deleteID = document.getElementById(deleteId)
+                        deleteID.remove()
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: err,
+                            timer: 3000
+                        })
+                    })
+                    .finally(() => {
+                        loader.classList.add('d-none')
+                    })
+            )
+        } else {
+            return;
+        }
+    })
+
+
 }
 
 cancelBtn.addEventListener('click', (e) => {
